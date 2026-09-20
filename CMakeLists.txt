@@ -10,6 +10,7 @@ add_executable(clover
     
     src/Lexer/Lexer.cpp
 
+    src/Support/Source.cpp
     src/Support/SourceReader.cpp
     src/Support/SourceCursor.cpp
 )

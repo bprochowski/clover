@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Support/Source.hpp"
 #include "Support/SourceCursor.hpp"
 
 class Lexer {
 public:
-    explicit Lexer(SourceCursor const& cursor);
+    explicit Lexer(Source const& source);
 
 private:
-    SourceCursor const& cursor_;
+    Source const& source_;
+    SourceCursor cursor_;
 };

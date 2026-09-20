@@ -1,6 +1,7 @@
 #include "Lexer.hpp"
 
-Lexer::Lexer(SourceCursor const& cursor)
-    : cursor_(cursor)
+Lexer::Lexer(Source const& source)
+    : source_(source)
+    , cursor_(source.text_view())
 {
 }

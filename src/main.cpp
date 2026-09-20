@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Support/Source.hpp"
 #include "Support/SourceCursor.hpp"
 #include "Support/SourceReader.hpp"
 
@@ -12,14 +13,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    auto const source = source_reader::load(argv[1]);
-    if (!source.has_value()) {
-        std::cout << source.error() << std::endl;
+    auto const source_text = source_reader::load(argv[1]);
+    if (!source_text.has_value()) {
+        std::cout << source_text.error() << std::endl;
         return 1;
     }
 
-    SourceCursor source_cursor(source.value());
-    Lexer lexer(source_cursor);
+    Source source(source_text.value());
+    Lexer lexer(source);
 
     return 0;
 }

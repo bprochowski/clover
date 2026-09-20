@@ -14,28 +14,51 @@ SourceCursor::SourceCursor(std::string_view const source)
 
 char SourceCursor::peek(uint8_t const offset)
 {
-    uint16_t position_ahead = position_ + offset;
-    if (position_ahead < source_.length()) {
-        return source_.at(position_ahead);
+    if (is_at_end_(offset)) {
+        return source_end_mark;
     }
 
-    return source_end_mark;
+    return source_[position_ + offset];
 }
 
-char SourceCursor::advance()
+char SourceCursor::consume()
 {
-    if (position_ + 1 < source_.length()) {
-        return source_.at(position_++);
+    if (is_at_end_()) {
+        return source_end_mark;
     }
 
-    return source_end_mark;
+    return source_[position_++];
+}
+
+void SourceCursor::advance()
+{
+    if (!is_at_end_(1)) {
+        ++position_;
+    }
+}
+
+bool SourceCursor::match(char const character)
+{
+    if (peek() == character) {
+        advance();
+        return true;
+    }
+
+    return false;
 }
 
 void SourceCursor::skip_while(std::vector<char> const& char_to_skip)
 {
-    for (; position_ < source_.length(); ++position_) {
+    while (!is_at_end_()) {
         if (std::find(char_to_skip.begin(), char_to_skip.end(), source_[position_]) == char_to_skip.end()) {
             break;
         }
+
+        ++position_;
     }
+}
+
+bool SourceCursor::is_at_end_(uint8_t const offset) const
+{
+    return position_ + offset >= source_.length();
 }
