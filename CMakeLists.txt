@@ -9,6 +9,7 @@ add_executable(clover
     src/main.cpp
     
     src/Lexer/Lexer.cpp
+    src/Lexer/Token.cpp
 
     src/Support/Source.cpp
     src/Support/SourceReader.cpp

@@ -21,6 +21,7 @@ int main(int argc, char** argv)
 
     Source source(source_text.value());
     Lexer lexer(source);
+    lexer.tokenize();
 
     return 0;
 }
