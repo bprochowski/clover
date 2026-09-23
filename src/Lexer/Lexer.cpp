@@ -34,24 +34,29 @@ Lexer::Lexer(Source const& source)
 {
 }
 
-std::vector<Token> Lexer::tokenize()
+TokenizationResult Lexer::tokenize()
 {
     std::vector<Token> tokens;
+    std::vector<std::string> errors;
 
     while (true) {
-        auto const token = get_token_();
-        if (!token.has_value()) {
-            std::cout << token.error() << std::endl;
-            exit(1);
-        }
+        auto const is_eof = get_token_()
+                                .and_then([&tokens](Token const& token) -> std::expected<bool, std::string> {
+                                    tokens.push_back(token);
+                                    return token.is_type(Token::Type::eof);
+                                })
+                                .or_else([&errors](std::string const& error) -> std::expected<bool, std::string> {
+                                    errors.push_back(error);
+                                    return false;
+                                })
+                                .value();
 
-        tokens.push_back(token.value());
-        if (token->is_type(Token::Type::eof)) {
+        if (is_eof) {
             break;
         }
     }
 
-    return tokens;
+    return errors.empty() ? TokenizationResult(tokens) : std::unexpected(errors);
 }
 
 TokenOrError Lexer::get_token_()

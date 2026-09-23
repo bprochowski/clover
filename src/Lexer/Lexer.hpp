@@ -9,11 +9,14 @@
 #include "Support/SourceCursor.hpp"
 
 using TokenOrError = std::expected<Token, std::string>;
+using Tokens = std::vector<Token>;
+using Errors = std::vector<std::string>;
+using TokenizationResult = std::expected<Tokens, Errors>;
 
 class Lexer {
 public:
     explicit Lexer(Source const& source);
-    std::vector<Token> tokenize();
+    TokenizationResult tokenize();
 
 private:
     TokenOrError get_token_();
