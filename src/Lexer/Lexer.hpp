@@ -22,6 +22,7 @@ private:
     TokenOrError get_token_();
     std::optional<Token> identifier_or_keyword_();
     std::optional<Token> number_literal_();
+    TokenOrError fixed_token_or_error_();
 
     Source const& source_;
     SourceCursor cursor_;

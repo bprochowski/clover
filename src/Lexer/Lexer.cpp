@@ -71,38 +71,7 @@ TokenOrError Lexer::get_token_()
         return token.value();
     }
 
-    auto const consumed_character = cursor_.consume();
-    switch (consumed_character) {
-    case '\0': {
-        return Token(Token::Type::eof);
-    }
-    case '(': {
-        return Token(Token::Type::left_paren);
-    }
-    case ')': {
-        return Token(Token::Type::right_paren);
-    }
-    case '{': {
-        return Token(Token::Type::left_brace);
-    }
-    case '}': {
-        return Token(Token::Type::right_brace);
-    }
-    case ';': {
-        return Token(Token::Type::semicolon);
-    }
-    case '-': {
-        if (cursor_.match('>')) {
-            return Token(Token::Type::arrow);
-        }
-
-        return Token(Token::Type::minus);
-    }
-    default:
-        break;
-    }
-
-    return std::unexpected(std::format("Unknown character: {}", consumed_character));
+    return fixed_token_or_error_();
 }
 
 std::optional<Token> Lexer::identifier_or_keyword_()
@@ -129,4 +98,37 @@ std::optional<Token> Lexer::number_literal_()
     } while (is_digit(cursor_.peek()));
 
     return Token(Token::Type::number);
+}
+
+TokenOrError Lexer::fixed_token_or_error_()
+{
+    switch (auto const character = cursor_.consume()) {
+    case '\0': {
+        return Token(Token::Type::eof);
+    }
+    case '(': {
+        return Token(Token::Type::left_paren);
+    }
+    case ')': {
+        return Token(Token::Type::right_paren);
+    }
+    case '{': {
+        return Token(Token::Type::left_brace);
+    }
+    case '}': {
+        return Token(Token::Type::right_brace);
+    }
+    case ';': {
+        return Token(Token::Type::semicolon);
+    }
+    case '-': {
+        if (cursor_.match('>')) {
+            return Token(Token::Type::arrow);
+        }
+
+        return Token(Token::Type::minus);
+    }
+    default:
+        return std::unexpected(std::format("Unknown character: {}", character));
+    }
 }
