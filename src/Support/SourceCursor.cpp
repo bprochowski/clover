@@ -47,6 +47,11 @@ bool SourceCursor::match(char const character)
     return false;
 }
 
+uint16_t SourceCursor::position()
+{
+    return position_;
+}
+
 void SourceCursor::skip_while(std::vector<char> const& char_to_skip)
 {
     while (!is_at_end_()) {

@@ -5,6 +5,7 @@
 #include "Support/SourceReader.hpp"
 
 #include "Lexer/Lexer.hpp"
+#include "Parser/Parser.hpp"
 
 int main(int argc, char** argv)
 {
@@ -29,6 +30,9 @@ int main(int argc, char** argv)
 
         exit(1);
     }
+
+    Parser parser(tokens.value());
+    auto fn_node = parser.build_ast();
 
     return 0;
 }

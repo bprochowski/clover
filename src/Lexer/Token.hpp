@@ -1,6 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <stdint.h>
+#include <string>
 
 class Token {
 public:
@@ -14,12 +16,15 @@ public:
         right_brace,
         semicolon,
         minus,
-        arrow
+        arrow,
+        kw_fn
     };
 
-    Token(Type const type);
+    Token(Type const type, std::optional<std::string> value = std::nullopt);
     bool is_type(Type const type) const;
+    std::optional<std::string> literal();
 
 private:
     Type type_;
+    std::optional<std::string> value_;
 };

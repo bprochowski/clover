@@ -23,6 +23,7 @@ private:
     std::optional<Token> identifier_or_keyword_();
     std::optional<Token> number_literal_();
     TokenOrError fixed_token_or_error_();
+    Token::Type identifier_or_keyword_type_(std::string_view literal);
 
     Source const& source_;
     SourceCursor cursor_;

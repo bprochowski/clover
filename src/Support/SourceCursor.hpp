@@ -11,6 +11,7 @@ public:
     char consume();
     void advance();
     bool match(char const character);
+    uint16_t position();
 
     void skip_while(std::vector<char> const& char_to_skip);
 

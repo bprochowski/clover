@@ -3,8 +3,18 @@
 #include <cctype>
 #include <format>
 #include <iostream>
+#include <ranges>
 
 namespace {
+struct Keyword {
+    std::string_view text;
+    Token::Type type;
+};
+
+constexpr std::array<Keyword, 1> keywords = {
+    { "fn", Token::Type::kw_fn },
+};
+
 const std::vector<char> whitespace_chars = { '\n', '\0', '\t', '\r', ' ' };
 
 bool is_alpha(char const character)
@@ -80,11 +90,16 @@ std::optional<Token> Lexer::identifier_or_keyword_()
         return std::nullopt;
     }
 
+    auto const id_start = cursor_.position();
+
     do {
         cursor_.advance();
     } while (is_identifier_continue(cursor_.peek()));
 
-    return Token(Token::Type::identifier);
+    auto const id_end = cursor_.position();
+
+    auto const literal = source_.slice(id_start, id_end);
+    return Token(identifier_or_keyword_type_(literal), literal);
 }
 
 std::optional<Token> Lexer::number_literal_()
@@ -93,11 +108,15 @@ std::optional<Token> Lexer::number_literal_()
         return std::nullopt;
     }
 
+    auto const num_start = cursor_.position();
+
     do {
         cursor_.advance();
     } while (is_digit(cursor_.peek()));
 
-    return Token(Token::Type::number);
+    auto const num_end = cursor_.position();
+
+    return Token(Token::Type::number, source_.slice(num_start, num_end));
 }
 
 TokenOrError Lexer::fixed_token_or_error_()
@@ -131,4 +150,15 @@ TokenOrError Lexer::fixed_token_or_error_()
     default:
         return std::unexpected(std::format("Unknown character: {}", character));
     }
+}
+
+Token::Type Lexer::identifier_or_keyword_type_(std::string_view literal)
+{
+    auto it = std::ranges::find(keywords, literal, &Keyword::text);
+
+    if (it != keywords.end()) {
+        return it->type;
+    }
+
+    return Token::Type::identifier;
 }
