@@ -10,6 +10,8 @@ add_executable(clover
 
     src/Ast/Function.cpp
     src/Ast/Return.cpp
+
+    src/CodeGen/AsmGenerator.cpp
     
     src/Lexer/Lexer.cpp
     src/Lexer/Token.cpp

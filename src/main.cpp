@@ -1,4 +1,7 @@
+#include <fstream>
 #include <iostream>
+
+#include "CodeGen/AsmGenerator.hpp"
 
 #include "Support/Source.hpp"
 #include "Support/SourceCursor.hpp"
@@ -33,6 +36,18 @@ int main(int argc, char** argv)
 
     Parser parser(tokens.value());
     auto fn_node = parser.build_ast();
+
+    auto const generated_asm = AsmGenerator { }.emit(fn_node);
+
+    std::ofstream out_file("clo.asm");
+    if (!out_file.is_open()) {
+        std::cout << "Filed to write .asm file" << std::endl;
+        exit(1);
+    }
+
+    out_file << ".intel_syntax noprefix" << std::endl;
+    out_file << generated_asm;
+    out_file.close();
 
     return 0;
 }
