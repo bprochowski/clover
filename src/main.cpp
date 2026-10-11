@@ -1,14 +1,56 @@
 #include <fstream>
 #include <iostream>
 
-#include "CodeGen/AsmGenerator.hpp"
-
 #include "Support/Source.hpp"
 #include "Support/SourceCursor.hpp"
 #include "Support/SourceReader.hpp"
 
 #include "Lexer/Lexer.hpp"
 #include "Parser/Parser.hpp"
+
+namespace {
+char const* operator_symbol(BinaryExpression::Operator const op)
+{
+    switch (op) {
+    case BinaryExpression::Operator::plus:
+        return "+";
+    case BinaryExpression::Operator::minus:
+        return "-";
+    case BinaryExpression::Operator::slash:
+        return "/";
+    case BinaryExpression::Operator::asterisk:
+        return "*";
+    }
+
+    return "?";
+}
+
+struct ExpressionPrinter {
+    int depth = 0;
+
+    void operator()(Identifier const& node) const
+    {
+        std::cout << indent() << "Identifier(" << node.name() << ")" << std::endl;
+    }
+
+    void operator()(Integer const& node) const
+    {
+        std::cout << indent() << "Integer(" << node.value() << ")" << std::endl;
+    }
+
+    void operator()(BinaryExpression const& node) const
+    {
+        std::cout << indent() << "BinaryExpression(" << operator_symbol(node.op()) << ")" << std::endl;
+        std::visit(ExpressionPrinter { depth + 1 }, node.lhs());
+        std::visit(ExpressionPrinter { depth + 1 }, node.rhs());
+    }
+
+    std::string indent() const
+    {
+        return std::string(depth * 2, ' ');
+    }
+};
+}
 
 int main(int argc, char** argv)
 {
@@ -36,18 +78,6 @@ int main(int argc, char** argv)
 
     Parser parser(tokens.value());
     auto fn_node = parser.build_ast();
-
-    auto const generated_asm = AsmGenerator { }.emit(fn_node);
-
-    std::ofstream out_file("clo.asm");
-    if (!out_file.is_open()) {
-        std::cout << "Filed to write .asm file" << std::endl;
-        exit(1);
-    }
-
-    out_file << ".intel_syntax noprefix" << std::endl;
-    out_file << generated_asm;
-    out_file.close();
 
     return 0;
 }
