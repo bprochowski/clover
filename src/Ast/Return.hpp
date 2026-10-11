@@ -2,15 +2,19 @@
 
 #include "Return.hpp"
 
+#include "Ast/BinaryExpression.hpp"
+#include "Ast/Identifier.hpp"
+#include "Ast/Integer.hpp"
+
 #include <string>
 
 namespace ast {
 class Return {
 public:
-    explicit Return(std::string const& value);
-    std::string value() const;
+    explicit Return(std::unique_ptr<Expression> expr);
+    Expression const& value() const;
 
 private:
-    std::string value_;
+    std::unique_ptr<Expression> expr_;
 };
 }

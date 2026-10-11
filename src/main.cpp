@@ -79,5 +79,7 @@ int main(int argc, char** argv)
     Parser parser(tokens.value());
     auto fn_node = parser.build_ast();
 
+    std::visit(ExpressionPrinter { }, fn_node.body().value());
+
     return 0;
 }

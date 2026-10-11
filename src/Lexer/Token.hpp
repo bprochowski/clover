@@ -16,12 +16,16 @@ public:
         right_brace,
         semicolon,
         minus,
+        plus,
+        slash,
+        asterisk,
         arrow,
         kw_fn
     };
 
     Token(Type const type, std::optional<std::string> value = std::nullopt);
     bool is_type(Type const type) const;
+    Token::Type type() const;
     std::optional<std::string> literal();
 
 private:

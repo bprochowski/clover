@@ -9,7 +9,7 @@ class Function {
 public:
     explicit Function(std::string const& name, ast::Return body);
     std::string name() const;
-    ast::Return body() const;
+    ast::Return const& body() const;
 
 private:
     std::string name_;

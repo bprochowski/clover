@@ -3,7 +3,7 @@
 namespace ast {
 Function::Function(std::string const& name, ast::Return body)
     : name_(name)
-    , body_(body)
+    , body_(std::move(body))
 {
 }
 
@@ -12,7 +12,7 @@ std::string Function::name() const
     return name_;
 }
 
-ast::Return Function::body() const
+ast::Return const& Function::body() const
 {
     return body_;
 }

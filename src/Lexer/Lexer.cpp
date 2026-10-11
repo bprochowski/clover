@@ -147,6 +147,15 @@ TokenOrError Lexer::fixed_token_or_error_()
 
         return Token(Token::Type::minus);
     }
+    case '+': {
+        return Token(Token::Type::plus);
+    }
+    case '/': {
+        return Token(Token::Type::slash);
+    }
+    case '*': {
+        return Token(Token::Type::asterisk);
+    }
     default:
         return std::unexpected(std::format("Unknown character: {}", character));
     }

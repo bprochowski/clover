@@ -1,13 +1,13 @@
 #include "Return.hpp"
 
 namespace ast {
-Return::Return(std::string const& value)
-    : value_(value)
+Return::Return(std::unique_ptr<Expression> expr)
+    : expr_(std::move(expr))
 {
 }
 
-std::string Return::value() const
+Expression const& Return::value() const
 {
-    return value_;
+    return *expr_;
 }
 }
