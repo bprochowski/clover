@@ -5,7 +5,9 @@
 #include <Ast/Identifier.hpp>
 #include <Ast/Return.hpp>
 
+#include <IR/Define.hpp>
 #include <IR/Function.hpp>
+#include <IR/Store.hpp>
 
 #include <iostream>
 
@@ -28,6 +30,21 @@ public:
     void operator()(ast::Return const& node)
     {
         basic_block_.add_instruction(ir::Return(this->operator()(node.value())));
+    }
+
+    void operator()(FunctionBody const& node)
+    {
+        for (auto const& stmt : node) {
+            std::visit(*this, stmt);
+        }
+    }
+    void operator()(ast::Variable const& node)
+    {
+        basic_block_.add_instruction(ir::Define { node.name() });
+        if (node.has_initializer()) {
+            auto value = this->operator()(node.initializer());
+            basic_block_.add_instruction(ir::Store { node.name(), value });
+        }
     }
 
     ir::Function operator()(ast::Function const& node)

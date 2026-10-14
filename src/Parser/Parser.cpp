@@ -57,6 +57,12 @@ std::optional<FunctionOrError> Parser::function_()
         exit(1);
     }
 
+    auto variable = variable_();
+    if (!variable.has_value()) {
+        std::cout << variable.error() << std::endl;
+        exit(1);
+    }
+
     auto return_stmt = return_stmt_();
     if (!return_stmt.has_value()) {
         std::cout << return_stmt.error() << std::endl;
@@ -68,7 +74,10 @@ std::optional<FunctionOrError> Parser::function_()
         exit(1);
     }
 
-    return ast::Function(token_name.literal().value(), std::move(return_stmt.value()));
+    FunctionBody fb;
+    fb.push_back(std::move(*variable));
+    fb.push_back(std::move(*return_stmt));
+    return ast::Function(token_name.literal().value(), std::move(fb));
 }
 
 ReturnOrError Parser::return_stmt_()
@@ -85,6 +94,31 @@ ReturnOrError Parser::return_stmt_()
     }
 
     return ast::Return(std::move(expr));
+}
+
+VariableOrError Parser::variable_()
+{
+    if (!tokens_.match(Token::Type::kw_var)) {
+        return std::unexpected("missing kw var");
+    }
+
+    auto identifier = tokens_.peek();
+    if (!identifier.is_type(Token::Type::identifier)) {
+        return std::unexpected("missing identifier name");
+    }
+
+    tokens_.advance();
+
+    std::unique_ptr<Expression> expr;
+    if (tokens_.match(Token::Type::equal)) {
+        expr = expression_();
+    }
+
+    if (!tokens_.match(Token::Type::semicolon)) {
+        return std::unexpected("Missing termination");
+    }
+
+    return ast::Variable(identifier.literal().value(), std::move(expr));
 }
 
 std::unique_ptr<Expression> Parser::expression_()

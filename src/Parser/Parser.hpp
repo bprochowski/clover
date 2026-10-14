@@ -6,6 +6,7 @@
 #include "Ast/BinaryExpression.hpp"
 #include "Ast/Identifier.hpp"
 #include "Ast/Integer.hpp"
+#include "Ast/Variable.hpp"
 
 #include "Lexer/Token.hpp"
 #include "Support/TokenCursor.hpp"
@@ -17,6 +18,7 @@
 
 using FunctionOrError = std::expected<ast::Function, std::string>;
 using ReturnOrError = std::expected<ast::Return, std::string>;
+using VariableOrError = std::expected<ast::Variable, std::string>;
 
 struct Operator {
     BinaryExpression::Operator op;
@@ -32,6 +34,7 @@ public:
 private:
     std::optional<FunctionOrError> function_();
     ReturnOrError return_stmt_();
+    VariableOrError variable_();
     std::unique_ptr<Expression> expression_();
     std::unique_ptr<Expression> expression_with_precedence_(uint16_t min_precedence);
     std::unique_ptr<Expression> primary_();

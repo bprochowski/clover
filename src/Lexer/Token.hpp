@@ -20,7 +20,9 @@ public:
         slash,
         asterisk,
         arrow,
-        kw_fn
+        equal,
+        kw_fn,
+        kw_var
     };
 
     Token(Type const type, std::optional<std::string> value = std::nullopt);

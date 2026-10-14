@@ -1,5 +1,6 @@
 #include "Lexer.hpp"
 
+#include <array>
 #include <cctype>
 #include <format>
 #include <iostream>
@@ -11,9 +12,10 @@ struct Keyword {
     Token::Type type;
 };
 
-constexpr std::array<Keyword, 1> keywords = {
+constexpr std::array<Keyword, 2> keywords = { {
     { "fn", Token::Type::kw_fn },
-};
+    { "var", Token::Type::kw_var },
+} };
 
 const std::vector<char> whitespace_chars = { '\n', '\0', '\t', '\r', ' ' };
 
@@ -155,6 +157,9 @@ TokenOrError Lexer::fixed_token_or_error_()
     }
     case '*': {
         return Token(Token::Type::asterisk);
+    }
+    case '=': {
+        return Token(Token::Type::equal);
     }
     default:
         return std::unexpected(std::format("Unknown character: {}", character));

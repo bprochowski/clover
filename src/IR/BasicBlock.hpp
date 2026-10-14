@@ -4,11 +4,13 @@
 #include <vector>
 
 #include "BinaryOperation.hpp"
+#include "Define.hpp"
 #include "Load.hpp"
 #include "Return.hpp"
+#include "Store.hpp"
 
 namespace ir {
-using Instruction = std::variant<BinaryOperation, Load, Return>;
+using Instruction = std::variant<BinaryOperation, Load, Return, Store, Define>;
 class BasicBlock {
 public:
     std::vector<Instruction> get_instructions() const

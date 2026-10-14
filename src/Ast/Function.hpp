@@ -1,18 +1,24 @@
 #pragma once
 
 #include "Return.hpp"
+#include "Variable.hpp"
 
 #include <string>
+#include <variant>
+#include <vector>
+
+using Statement = std::variant<ast::Variable, ast::Return>;
+using FunctionBody = std::vector<Statement>;
 
 namespace ast {
 class Function {
 public:
-    explicit Function(std::string const& name, ast::Return body);
+    explicit Function(std::string const& name, FunctionBody body);
     std::string name() const;
-    ast::Return const& body() const;
+    FunctionBody const& body() const;
 
 private:
     std::string name_;
-    ast::Return body_;
+    FunctionBody body_;
 };
 }

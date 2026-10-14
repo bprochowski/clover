@@ -44,6 +44,16 @@ struct IrPrinter {
         std::cout << "  " << (*this)(inst.get_destination()) << " = load " << inst.get_name() << std::endl;
     }
 
+    void operator()(ir::Store const& inst) const
+    {
+        std::cout << "  store " << inst.get_name() << ", " << std::visit(*this, inst.value()) << std::endl;
+    }
+
+    void operator()(ir::Define const& inst) const
+    {
+        std::cout << "  define " << inst.get_name() << std::endl;
+    }
+
     void operator()(ir::Return const& inst) const
     {
         std::cout << "  ret " << std::visit(*this, inst.value()) << std::endl;
