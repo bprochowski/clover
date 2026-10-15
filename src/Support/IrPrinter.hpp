@@ -33,6 +33,11 @@ struct IrPrinter {
         return "%" + var.id;
     }
 
+    void operator()(ir::Branch const& inst) const
+    {
+        std::cout << "  br_if " << std::visit(*this, inst.condition) << ", " << inst.then_ << ", " << inst.else_ << std::endl;
+    }
+
     void operator()(ir::BinaryOperation const& inst) const
     {
         std::cout << "  " << (*this)(inst.get_destination()) << " = " << bin_op_name(inst.get_kind()) << " "
@@ -62,8 +67,11 @@ struct IrPrinter {
     void operator()(ir::Function const& fn) const
     {
         std::cout << "fn " << fn.name() << ":" << std::endl;
-        for (auto const& inst : fn.body().get_instructions()) {
-            std::visit(*this, inst);
+        for (auto const& basic_block : fn.body()) {
+            std::cout << basic_block.get_lable() << ":" << std::endl;
+            for (auto const& inst : basic_block.get_instructions()) {
+                std::visit(*this, inst);
+            }
         }
     }
 };

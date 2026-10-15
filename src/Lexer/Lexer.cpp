@@ -12,9 +12,11 @@ struct Keyword {
     Token::Type type;
 };
 
-constexpr std::array<Keyword, 2> keywords = { {
+constexpr std::array<Keyword, 4> keywords = { {
     { "fn", Token::Type::kw_fn },
     { "var", Token::Type::kw_var },
+    { "if", Token::Type::kw_if },
+    { "else", Token::Type::kw_else },
 } };
 
 const std::vector<char> whitespace_chars = { '\n', '\0', '\t', '\r', ' ' };

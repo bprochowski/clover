@@ -5,7 +5,7 @@
 namespace ir {
 class Function {
 public:
-    Function(std::string_view const name, BasicBlock const& basic_block)
+    Function(std::string_view const name, std::vector<BasicBlock> const& basic_block)
         : name_(name)
         , body_(basic_block)
     {
@@ -16,13 +16,13 @@ public:
         return name_;
     }
 
-    BasicBlock body() const
+    std::vector<BasicBlock> body() const
     {
         return body_;
     }
 
 private:
     std::string name_;
-    BasicBlock body_;
+    std::vector<BasicBlock> body_;
 };
 }

@@ -29,7 +29,7 @@ class IrGenerator {
 public:
     void operator()(ast::Return const& node)
     {
-        basic_block_.add_instruction(ir::Return(this->operator()(node.value())));
+        current_bb_().add_instruction(ir::Return(this->operator()(node.value())));
     }
 
     void operator()(FunctionBody const& node)
@@ -40,15 +40,35 @@ public:
     }
     void operator()(ast::Variable const& node)
     {
-        basic_block_.add_instruction(ir::Define { node.name() });
+        current_bb_().add_instruction(ir::Define { node.name() });
         if (node.has_initializer()) {
             auto value = this->operator()(node.initializer());
-            basic_block_.add_instruction(ir::Store { node.name(), value });
+            current_bb_().add_instruction(ir::Store { node.name(), value });
         }
+    }
+
+    void operator()(ast::If const& node)
+    {
+        auto condition = this->operator()(node.condition());
+        auto lable_id = std::to_string(lable_id_);
+        auto then_lable = std::format("then.{}", lable_id);
+        auto else_lable = std::format("else.{}", lable_id);
+        auto end_lable = std::format("end.{}", lable_id);
+
+        current_bb_().add_instruction(ir::Branch { condition, then_lable, else_lable });
+
+        init_bb_(then_lable);
+        this->operator()(node.then_block());
+
+        init_bb_(else_lable);
+        this->operator()(node.else_block());
+
+        init_bb_("fn_end");
     }
 
     ir::Function operator()(ast::Function const& node)
     {
+        init_bb_("fn_entry");
         this->operator()(node.body());
         return ir::Function(node.name(), basic_block_);
     }
@@ -62,7 +82,7 @@ public:
     {
         this->bump_();
         ir::VirtualVar dst { std::to_string(this->virtual_var_id_) };
-        basic_block_.add_instruction(ir::Load { dst, node.name() });
+        current_bb_().add_instruction(ir::Load { dst, node.name() });
         return dst;
     }
 
@@ -77,12 +97,20 @@ public:
         auto rhs = this->operator()(node.rhs());
         this->bump_();
         ir::VirtualVar dst { std::to_string(this->virtual_var_id_) };
-        basic_block_.add_instruction(ir::BinaryOperation { to_bin_op_kind(node.op()), dst, lhs, rhs });
+        current_bb_().add_instruction(ir::BinaryOperation { to_bin_op_kind(node.op()), dst, lhs, rhs });
         return dst;
     }
 
 private:
     int virtual_var_id_ = -1;
+    int lable_id_ = 0;
     void bump_() { ++virtual_var_id_; }
-    ir::BasicBlock basic_block_;
+    std::vector<ir::BasicBlock> basic_block_;
+    int bb_index_ { -1 };
+    void init_bb_(std::string_view const lable)
+    {
+        ++bb_index_;
+        basic_block_.emplace_back(lable);
+    }
+    ir::BasicBlock& current_bb_() { return basic_block_[bb_index_]; }
 };

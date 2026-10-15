@@ -1,14 +1,11 @@
 #pragma once
 
-#include "Return.hpp"
-#include "Variable.hpp"
+#include "If.hpp"
+#include "Statement.hpp"
 
 #include <string>
-#include <variant>
-#include <vector>
 
-using Statement = std::variant<ast::Variable, ast::Return>;
-using FunctionBody = std::vector<Statement>;
+using FunctionBody = StatementList;
 
 namespace ast {
 class Function {
