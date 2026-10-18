@@ -24,7 +24,8 @@ public:
         kw_fn,
         kw_var,
         kw_if,
-        kw_else
+        kw_else,
+        kw_return,
     };
 
     Token(Type const type, std::optional<std::string> value = std::nullopt);

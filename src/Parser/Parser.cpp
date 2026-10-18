@@ -89,7 +89,7 @@ std::optional<FunctionOrError> Parser::function_()
 
 ReturnOrError Parser::return_stmt_()
 {
-    if (!tokens_.match(Token::Type::identifier)) {
+    if (!tokens_.match(Token::Type::kw_return)) {
         return std::unexpected("Missing return keyword");
     }
 
