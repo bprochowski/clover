@@ -62,9 +62,16 @@ public:
         init_bb_(then_lable);
         this->operator()(node.then_block());
 
+        if (!current_bb_().is_terminated()) {
+            current_bb_().add_instruction(ir::Jump(end_lable));
+        }
+
         if (node.else_block().size() > 0) {
             init_bb_(else_lable);
             this->operator()(node.else_block());
+            if (!current_bb_().is_terminated()) {
+                current_bb_().add_instruction(ir::Jump(end_lable));
+            }
         }
 
         init_bb_(end_lable);

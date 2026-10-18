@@ -74,4 +74,9 @@ struct IrPrinter {
             }
         }
     }
+
+    void operator()(ir::Jump const& jump) const
+    {
+        std::cout << "  jmp " << jump.lable() << std::endl;
+    }
 };
