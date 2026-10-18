@@ -57,22 +57,14 @@ std::optional<FunctionOrError> Parser::function_()
         exit(1);
     }
 
-    auto variable = variable_();
-    if (!variable.has_value()) {
-        std::cout << variable.error() << std::endl;
-        exit(1);
-    }
+    FunctionBody fb;
+    while (true) {
+        auto stmt = statement_();
+        if (!stmt.has_value()) {
+            break;
+        }
 
-    auto if_stmt = if_();
-    if (!if_stmt.has_value()) {
-        std::cout << if_stmt.error() << std::endl;
-        exit(1);
-    }
-
-    auto return_stmt = return_stmt_();
-    if (!return_stmt.has_value()) {
-        std::cout << return_stmt.error() << std::endl;
-        exit(1);
+        fb.push_back(std::move(stmt.value()));
     }
 
     if (!tokens_.match(Token::Type::right_brace)) {
@@ -80,17 +72,45 @@ std::optional<FunctionOrError> Parser::function_()
         exit(1);
     }
 
-    FunctionBody fb;
-    fb.push_back(std::move(*variable));
-    fb.push_back(std::move(*if_stmt));
-    fb.push_back(std::move(*return_stmt));
     return ast::Function(token_name.literal().value(), std::move(fb));
 }
 
-ReturnOrError Parser::return_stmt_()
+OptionalStatement Parser::statement_()
+{
+    if (auto ret_stmt = return_stmt_(); ret_stmt.has_value()) {
+        auto& ret = ret_stmt.value();
+        if (ret.has_value()) {
+            return std::move(ret.value());
+        }
+
+        std::cout << ret.error() << std::endl;
+    }
+
+    if (auto variable = variable_(); variable.has_value()) {
+        auto& var = variable.value();
+        if (var.has_value()) {
+            return std::move(var.value());
+        }
+
+        std::cout << var.error() << std::endl;
+    }
+
+    if (auto if_stmt = if_(); if_stmt.has_value()) {
+        auto& if_smt = if_stmt.value();
+        if (if_smt.has_value()) {
+            return std::move(if_smt.value());
+        }
+
+        std::cout << if_smt.error() << std::endl;
+    }
+
+    return std::nullopt;
+}
+
+OptionalReturn Parser::return_stmt_()
 {
     if (!tokens_.match(Token::Type::kw_return)) {
-        return std::unexpected("Missing return keyword");
+        return std::nullopt;
     }
 
     auto expr = expression_();
@@ -103,10 +123,10 @@ ReturnOrError Parser::return_stmt_()
     return ast::Return(std::move(expr));
 }
 
-VariableOrError Parser::variable_()
+OptionalVariable Parser::variable_()
 {
     if (!tokens_.match(Token::Type::kw_var)) {
-        return std::unexpected("missing kw var");
+        return std::nullopt;
     }
 
     auto identifier = tokens_.peek();
@@ -128,10 +148,10 @@ VariableOrError Parser::variable_()
     return ast::Variable(identifier.literal().value(), std::move(expr));
 }
 
-IfOrError Parser::if_()
+OptionalIf Parser::if_()
 {
     if (!tokens_.match(Token::Type::kw_if)) {
-        return std::unexpected("Missing kw if");
+        return std::nullopt;
     }
 
     if (!tokens_.match(Token::Type::left_paren)) {
@@ -149,24 +169,18 @@ IfOrError Parser::if_()
         return std::unexpected("Missing {");
     }
 
-    auto variable = variable_();
-    if (!variable.has_value()) {
-        std::cout << variable.error() << std::endl;
-        exit(1);
-    }
+    while (true) {
+        auto stmt = statement_();
+        if (!stmt.has_value()) {
+            break;
+        }
 
-    auto return_stmt = return_stmt_();
-    if (!return_stmt.has_value()) {
-        std::cout << return_stmt.error() << std::endl;
-        exit(1);
+        then_block.push_back(std::move(stmt.value()));
     }
 
     if (!tokens_.match(Token::Type::right_brace)) {
         return std::unexpected("Missing }");
     }
-
-    then_block.push_back(std::move(*variable));
-    then_block.push_back(std::move(*return_stmt));
 
     FunctionBody else_block;
     if (tokens_.match(Token::Type::kw_else)) {
@@ -174,24 +188,18 @@ IfOrError Parser::if_()
             return std::unexpected("Missing {");
         }
 
-        auto var_else = variable_();
-        if (!var_else.has_value()) {
-            std::cout << var_else.error() << std::endl;
-            exit(1);
-        }
+        while (true) {
+            auto stmt = statement_();
+            if (!stmt.has_value()) {
+                break;
+            }
 
-        auto ret_else = return_stmt_();
-        if (!ret_else.has_value()) {
-            std::cout << ret_else.error() << std::endl;
-            exit(1);
+            else_block.push_back(std::move(stmt.value()));
         }
 
         if (!tokens_.match(Token::Type::right_brace)) {
             return std::unexpected("Missing }");
         }
-
-        else_block.push_back(std::move(*var_else));
-        else_block.push_back(std::move(*ret_else));
     }
 
     return ast::If(std::move(expr), std::move(then_block), std::move(else_block));

@@ -22,6 +22,13 @@ using ReturnOrError = std::expected<ast::Return, std::string>;
 using VariableOrError = std::expected<ast::Variable, std::string>;
 using IfOrError = std::expected<ast::If, std::string>;
 
+using OptionalFunction = std::optional<FunctionOrError>;
+using OptionalReturn = std::optional<ReturnOrError>;
+using OptionalVariable = std::optional<VariableOrError>;
+using OptionalIf = std::optional<IfOrError>;
+
+using OptionalStatement = std::optional<Statement>;
+
 struct Operator {
     BinaryExpression::Operator op;
     uint8_t lbp;
@@ -35,9 +42,10 @@ public:
 
 private:
     std::optional<FunctionOrError> function_();
-    ReturnOrError return_stmt_();
-    VariableOrError variable_();
-    IfOrError if_();
+    OptionalStatement statement_();
+    OptionalReturn return_stmt_();
+    OptionalVariable variable_();
+    OptionalIf if_();
     std::unique_ptr<Expression> expression_();
     std::unique_ptr<Expression> expression_with_precedence_(uint16_t min_precedence);
     std::unique_ptr<Expression> primary_();

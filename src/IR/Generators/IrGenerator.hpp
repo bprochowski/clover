@@ -49,21 +49,25 @@ public:
 
     void operator()(ast::If const& node)
     {
+        ++lable_id_;
         auto condition = this->operator()(node.condition());
         auto lable_id = std::to_string(lable_id_);
         auto then_lable = std::format("then.{}", lable_id);
         auto else_lable = std::format("else.{}", lable_id);
         auto end_lable = std::format("end.{}", lable_id);
 
-        current_bb_().add_instruction(ir::Branch { condition, then_lable, else_lable });
+        auto branching_end = node.else_block().size() > 0 ? else_lable : end_lable;
+        current_bb_().add_instruction(ir::Branch { condition, then_lable, branching_end });
 
         init_bb_(then_lable);
         this->operator()(node.then_block());
 
-        init_bb_(else_lable);
-        this->operator()(node.else_block());
+        if (node.else_block().size() > 0) {
+            init_bb_(else_lable);
+            this->operator()(node.else_block());
+        }
 
-        init_bb_("fn_end");
+        init_bb_(end_lable);
     }
 
     ir::Function operator()(ast::Function const& node)
@@ -103,7 +107,7 @@ public:
 
 private:
     int virtual_var_id_ = -1;
-    int lable_id_ = 0;
+    int lable_id_ = -1;
     void bump_() { ++virtual_var_id_; }
     std::vector<ir::BasicBlock> basic_block_;
     int bb_index_ { -1 };
