@@ -104,6 +104,15 @@ OptionalStatement Parser::statement_()
         std::cout << if_smt.error() << std::endl;
     }
 
+    if (auto while_stmt = while_(); while_stmt.has_value()) {
+        auto& ret = while_stmt.value();
+        if (ret.has_value()) {
+            return std::move(ret.value());
+        }
+
+        std::cout << ret.error() << std::endl;
+    }
+
     return std::nullopt;
 }
 
@@ -203,6 +212,43 @@ OptionalIf Parser::if_()
     }
 
     return ast::If(std::move(expr), std::move(then_block), std::move(else_block));
+}
+
+OptionalWhile Parser::while_()
+{
+    if (!tokens_.match(Token::Type::kw_while)) {
+        return std::nullopt;
+    }
+
+    if (!tokens_.match(Token::Type::left_paren)) {
+        return std::unexpected("Missing (");
+    }
+
+    auto expr = expression_();
+
+    if (!tokens_.match(Token::Type::right_paren)) {
+        return std::unexpected("Missing )");
+    }
+
+    FunctionBody body;
+    if (!tokens_.match(Token::Type::left_brace)) {
+        return std::unexpected("Missing {");
+    }
+
+    while (true) {
+        auto stmt = statement_();
+        if (!stmt.has_value()) {
+            break;
+        }
+
+        body.push_back(std::move(stmt.value()));
+    }
+
+    if (!tokens_.match(Token::Type::right_brace)) {
+        return std::unexpected("Missing }");
+    }
+
+    return ast::While(std::move(expr), std::move(body));
 }
 
 std::unique_ptr<Expression> Parser::expression_()

@@ -2,6 +2,7 @@
 
 #include "If.hpp"
 #include "Statement.hpp"
+#include "While.hpp"
 
 #include <string>
 

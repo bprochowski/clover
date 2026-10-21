@@ -6,12 +6,7 @@
 namespace ast {
 class If {
 public:
-    explicit If(std::unique_ptr<Expression> cond, StatementList then_block, StatementList else_block)
-        : condition_(std::move(cond))
-        , then_(std::move(then_block))
-        , else_(std::move(else_block))
-    {
-    }
+    explicit If(std::unique_ptr<Expression> cond, StatementList then_block, StatementList else_block);
 
     Expression const& condition() const
     {

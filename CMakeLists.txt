@@ -9,7 +9,9 @@ add_executable(clover
     src/main.cpp
 
     src/Ast/Function.cpp
+    src/Ast/If.cpp
     src/Ast/Return.cpp
+    src/Ast/While.cpp
 
     src/Lexer/Lexer.cpp
     src/Lexer/Token.cpp

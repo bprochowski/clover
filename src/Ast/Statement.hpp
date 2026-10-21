@@ -8,7 +8,8 @@
 
 namespace ast {
 class If;
+class While;
 }
 
-using Statement = std::variant<ast::Variable, ast::Return, ast::If>;
+using Statement = std::variant<ast::Variable, ast::Return, ast::If, ast::While>;
 using StatementList = std::vector<Statement>;

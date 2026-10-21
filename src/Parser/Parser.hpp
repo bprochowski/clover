@@ -8,6 +8,7 @@
 #include "Ast/If.hpp"
 #include "Ast/Integer.hpp"
 #include "Ast/Variable.hpp"
+#include "Ast/While.hpp"
 
 #include "Lexer/Token.hpp"
 #include "Support/TokenCursor.hpp"
@@ -21,11 +22,13 @@ using FunctionOrError = std::expected<ast::Function, std::string>;
 using ReturnOrError = std::expected<ast::Return, std::string>;
 using VariableOrError = std::expected<ast::Variable, std::string>;
 using IfOrError = std::expected<ast::If, std::string>;
+using WhileOrError = std::expected<ast::While, std::string>;
 
 using OptionalFunction = std::optional<FunctionOrError>;
 using OptionalReturn = std::optional<ReturnOrError>;
 using OptionalVariable = std::optional<VariableOrError>;
 using OptionalIf = std::optional<IfOrError>;
+using OptionalWhile = std::optional<WhileOrError>;
 
 using OptionalStatement = std::optional<Statement>;
 
@@ -46,6 +49,7 @@ private:
     OptionalReturn return_stmt_();
     OptionalVariable variable_();
     OptionalIf if_();
+    OptionalWhile while_();
     std::unique_ptr<Expression> expression_();
     std::unique_ptr<Expression> expression_with_precedence_(uint16_t min_precedence);
     std::unique_ptr<Expression> primary_();
