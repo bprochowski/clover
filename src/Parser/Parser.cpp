@@ -145,6 +145,17 @@ OptionalVariable Parser::variable_()
 
     tokens_.advance();
 
+    std::optional<std::string> type = std::nullopt;
+    if (tokens_.match(Token::Type::arrow)) {
+        auto type_token = tokens_.peek();
+        if (!type_token.is_type(Token::Type::identifier)) {
+            return std::unexpected("missing type");
+        }
+
+        type = type_token.literal();
+        tokens_.advance();
+    }
+
     std::unique_ptr<Expression> expr;
     if (tokens_.match(Token::Type::equal)) {
         expr = expression_();
@@ -154,7 +165,7 @@ OptionalVariable Parser::variable_()
         return std::unexpected("Missing termination");
     }
 
-    return ast::Variable(identifier.literal().value(), std::move(expr));
+    return ast::Variable(identifier.literal().value(), type, std::move(expr));
 }
 
 OptionalIf Parser::if_()
