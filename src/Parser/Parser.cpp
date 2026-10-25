@@ -42,7 +42,7 @@ std::optional<FunctionOrError> Parser::function_()
     }
 
     if (!tokens_.match(Token::Type::arrow)) {
-        std::cout << "Missing return type initializer";
+        std::cout << "Missing return type initializer" << std::endl;
         exit(1);
     }
 
@@ -85,6 +85,7 @@ OptionalStatement Parser::statement_()
         }
 
         std::cout << ret.error() << std::endl;
+        exit(1);
     }
 
     if (auto variable = variable_(); variable.has_value()) {
@@ -94,6 +95,7 @@ OptionalStatement Parser::statement_()
         }
 
         std::cout << var.error() << std::endl;
+        exit(1);
     }
 
     if (auto if_stmt = if_(); if_stmt.has_value()) {
@@ -103,6 +105,7 @@ OptionalStatement Parser::statement_()
         }
 
         std::cout << if_smt.error() << std::endl;
+        exit(1);
     }
 
     if (auto while_stmt = while_(); while_stmt.has_value()) {
@@ -112,6 +115,7 @@ OptionalStatement Parser::statement_()
         }
 
         std::cout << ret.error() << std::endl;
+        exit(1);
     }
 
     return std::nullopt;
@@ -126,7 +130,7 @@ OptionalReturn Parser::return_stmt_()
     auto expr = expression_();
 
     if (!tokens_.match(Token::Type::semicolon)) {
-        std::cout << tokens_.peek().literal().value();
+        std::cout << tokens_.peek().literal().value() << std::endl;
         return std::unexpected("Missing termination");
     }
 
@@ -298,7 +302,7 @@ std::unique_ptr<Expression> Parser::primary_()
         auto lhs = expression_with_precedence_(0);
 
         if (!tokens_.match(Token::Type::right_paren)) {
-            std::cout << "Unterminated paren expr";
+            std::cout << "Unterminated paren expr" << std::endl;
             exit(1);
         }
 
@@ -314,7 +318,7 @@ std::unique_ptr<Expression> Parser::primary_()
         return std::make_unique<Expression>(Integer(token.literal().value()));
     }
 
-    std::cout << "Unexpected token for expr";
+    std::cout << "Unexpected token for expr" << std::endl;
     exit(1);
 }
 

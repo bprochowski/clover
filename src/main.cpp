@@ -10,6 +10,7 @@
 #include "Parser/Parser.hpp"
 
 #include "IR/Generators/IrGenerator.hpp"
+#include "Semantic/TypeChecker.hpp"
 
 int main(int argc, char** argv)
 {
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
 
     Parser parser(tokens.value());
     auto fn_node = parser.build_ast();
-
+    TypeChecker { }(fn_node);
     auto gen_ir = IrGenerator { }(fn_node);
     IrPrinter { }(gen_ir);
 
