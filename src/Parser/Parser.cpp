@@ -29,7 +29,6 @@ std::optional<FunctionOrError> Parser::function_()
         std::cout << "Missing function name" << std::endl;
         exit(1);
     }
-
     tokens_.advance();
 
     if (!tokens_.match(Token::Type::left_paren)) {
@@ -43,14 +42,16 @@ std::optional<FunctionOrError> Parser::function_()
     }
 
     if (!tokens_.match(Token::Type::arrow)) {
-        std::cout << "Missing return type" << std::endl;
+        std::cout << "Missing return type initializer";
         exit(1);
     }
 
-    if (!tokens_.match(Token::Type::identifier)) {
-        std::cout << "Missing return type identifier" << std::endl;
+    auto return_type = tokens_.peek();
+    if (!return_type.is_type(Token::Type::identifier)) {
+        std::cout << "mising return type" << std::endl;
         exit(1);
     }
+    tokens_.advance();
 
     if (!tokens_.match(Token::Type::left_brace)) {
         std::cout << "Missing function body opening '{'" << std::endl;
@@ -72,7 +73,7 @@ std::optional<FunctionOrError> Parser::function_()
         exit(1);
     }
 
-    return ast::Function(token_name.literal().value(), std::move(fb));
+    return ast::Function(token_name.literal().value(), return_type.literal().value(), std::move(fb));
 }
 
 OptionalStatement Parser::statement_()
